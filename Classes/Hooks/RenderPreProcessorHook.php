@@ -28,6 +28,7 @@ use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use WapplerSystems\WsScss\Compiler;
 
@@ -125,11 +126,13 @@ class RenderPreProcessorHook
             }
 
             $scssFilePath = GeneralUtility::getFileAbsFileName($conf['file']);
+            $pathChunks = explode('/', PathUtility::getAbsoluteWebPath($scssFilePath));
+            $assetPath = implode('/', array_splice($pathChunks, 0, 3)) . '/';
 
             if ($inlineOutput) {
                 $useSourceMap = false;
             }
-            $cssFilePath = Compiler::compileFile($scssFilePath, array_merge($this->variables,$variables), $outputFilePath, $useSourceMap, $outputStyle);
+            $cssFilePath = Compiler::compileFile($scssFilePath, array_merge($this->variables,['extAssetPath' => $assetPath], $variables), $outputFilePath, $useSourceMap, $outputStyle);
 
             if ($inlineOutput) {
                 unset($cssFiles[$file]);

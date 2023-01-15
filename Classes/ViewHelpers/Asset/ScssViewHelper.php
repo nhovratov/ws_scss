@@ -7,6 +7,8 @@ namespace WapplerSystems\WsScss\ViewHelpers\Asset;
 use ScssPhp\ScssPhp\Exception\SassException;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Asset\CssViewHelper;
 use WapplerSystems\WsScss\Compiler;
 
@@ -51,6 +53,11 @@ class ScssViewHelper extends CssViewHelper
         ];
 
         if ($file !== null) {
+
+            $scssFilePath = GeneralUtility::getFileAbsFileName($file);
+            $pathChunks = explode('/',PathUtility::getAbsoluteWebPath($scssFilePath));
+            $assetPath = implode('/',array_splice($pathChunks,0,3)).'/';
+            $variables['extAssetPath'] = $assetPath;
 
             $cssFile = Compiler::compileFile($file, $variables, $outputFile);
 
